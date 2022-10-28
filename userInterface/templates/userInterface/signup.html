@@ -1,0 +1,137 @@
+{% load static %} {% load recaptcha2 %}
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>STERIS系统-注册</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="robots" content="all,follow">
+    <!-- Bootstrap CSS-->
+    {% recaptcha_init %}
+    <!-- <script src="{% static 'sign/js/signup_reca_ready_en.js' %}"></script> -->
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap-4.6.0-dist/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,700">
+    <link rel="stylesheet" href="{% static 'sign/css/style.default.css' %}" id="theme-stylesheet">
+    <link id="qq-style" rel="stylesheet" href="{% static 'manage/css/qq.css' %}">
+</head>
+
+<body>
+    <div class="page login-page">
+        <div class="container d-flex align-items-center">
+            <div class="form-holder has-shadow">
+                <div class="row">
+                    <!-- Logo & Information Panel-->
+                    <div class="col-lg-6">
+                        <div class="info d-flex align-items-center">
+                            <div class="content">
+                                <div class="logo">
+                                    <h1>欢迎注册</h1>
+                                </div>
+                                <p>endless小龙的自考成绩查询系统</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Form Panel    -->
+                    <div class="col-lg-6 bg-white">
+                        <div class="form d-flex align-items-center">
+                            <div class="content">
+                                <form method="post" action="signup" class="form-validate" id="signupForm">
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        {{ signup_form.zkzh }}
+                                        <div class="invalid-feedback">
+                                            准考证号必须12位数字
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        {{ signup_form.student_name }}
+                                        <div class="invalid-feedback">
+                                            仅支持2到4个字的中文姓名
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        {{ signup_form.password1 }}
+                                        <div class="invalid-feedback">
+                                            密码必须是16位 且同时包含大小写字母、数字和特殊符号（!@#$%^&*）
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        {{ signup_form.password2 }}
+                                        <div class="invalid-feedback">
+                                            两次密码必须相同
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        {{ signup_form.student_email }}
+                                        <div class="invalid-feedback">
+                                            邮箱地址不正确
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        {{ signup_form.checkcode }}
+                                        <div class="invalid-feedback">
+                                            请输入18位邮箱验证码
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        {{ signup_form.captcha }}
+                                        {% recaptcha_invisible_button submit_label='注册' custom_callback='regbtn_click' extra_css_classes="btn btn-primary"%}
+                                        <!-- <button id="regbtn" type="button" name="registerSubmit" class="btn btn-primary" onclick="regbtn_click()">注册</button> -->
+                                        <button id="passwdge" type="button" name="passwordGenerate" class="btn btn-primary" onclick="password_generate()">随机生成密码</button>
+                                        <br><br>
+                                        {% recaptcha_invisible_button submit_label='加载中...' custom_callback='submitonce' extra_css_classes="btn btn-default"%}
+                                        <!-- <button id="buttonId" type="button" class="btn btn-default" onclick="submitonce()" disabled="disabled"></button> -->
+                                    </div>
+                                </form>
+                                <small>已有账号?</small><a href="signin" class="signup">&nbsp;登录</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="QQ">
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+            展开/收起咨询
+        </button>
+        <div class="collapse" id="collapseExample">
+            <div class="well">
+                <div class="row" style="margin: 0 auto;">
+                    <div class="col-xs-6 col-md-3">
+                        <a target="_blank" href="https://wpa.qq.com/msgrd?v=3&uin=2114467924&site=qq&menu=yes">
+                            <img border="0" src="https://wpa.qq.com/pa?p=2:2114467924:53" alt="联系管理员" title="联系管理员" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- JavaScript files-->
+    <script src="{% static 'bootstrap-4.6.0-dist/js/jquery-3.5.1.min.js' %}"></script>
+    <script src="{% static 'bootstrap-4.6.0-dist/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'sign/js/commonUtil_en.js' %}"></script>
+    <!--弹出消息框-->
+    {{ request.session.left_time|json_script:"left_time" }}
+    {% if request.session.in_signup %}
+    {% if request.session.signup_zkzh %}
+    {{ request.session.signup_zkzh|json_script:"signup_zkzh" }}
+    {% endif %} {% if request.session.signup_student_name %}
+    {{ request.session.signup_student_name|json_script:"signup_student_name" }}
+    {% endif %} {% if request.session.signup_password1 %}
+    {{ request.session.signup_password1|json_script:"signup_password1" }}
+    {% endif %} {% if request.session.signup_password2 %}
+    {{ request.session.signup_password2|json_script:"signup_password2" }}
+    {% endif %}
+    {% if request.session.signup_student_email %}
+    {{ request.session.signup_student_email|json_script:"signup_student_email" }}
+    {% endif %}
+    {% endif %}
+    <script src="{% static 'sign/js/signup_en.js' %}"></script>
+</body>
+
+</html>
